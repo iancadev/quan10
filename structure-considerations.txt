@@ -39,6 +39,8 @@ Sequencer Class
             - there can be multiple cost_func's built for multiple pennylane optimizers (kinda like overloading)
         - ansatz_measure (samples the ansatz)
     It also keeps track of the energy of each iteration and has a bunch of helpful visualization statistics (EnergySpecialist instance in attribute)
+ (in parallel, we can have a QAOA class that functions similar to the Sequencer class, but does not have cost_function)
+
 
 Optimization program
     Imports the right Encoding .py
