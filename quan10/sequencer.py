@@ -19,7 +19,14 @@
 
 
 from qiskit.primitives import StatevectorEstimator, StatevectorSampler
-from qiskit.circuit.library import EfficientSU2
+from qiskit.circuit.library import (
+    EfficientSU2,
+    NLocal,
+    TwoLocal,
+    PauliTwoDesign,
+    RealAmplitudes,
+    ExcitationPreserving
+)
 from qiskit.circuit import QuantumRegister, QuantumCircuit
 
 import sys
@@ -69,20 +76,30 @@ class Sequencer:
     # --- Ansatz --- #
     
     def set_ansatz(self, name):
-        if name == 'qiskit-EfficientSU2':
+        if name.startswith('qiskit-'):
             self.structure['ansatz'] = 'qiskit'
-            self.structure['ansatz-type'] = 'EfficientSU2'
-            self.init_ansatz_qiskit(EfficientSU2)
+            self.structure['ansatz-type'] = name.split('-')[1]
+            self.init_ansatz_qiskit({
+                'EfficientSU2': EfficientSU2,
+                'NLocal': NLocal,
+                'TwoLocal': TwoLocal,
+                'PauliTwoDesign': PauliTwoDesign,
+                'RealAmplitudes': RealAmplitudes,
+                'ExcitationPreserving': ExcitationPreserving
+            }[self.structure['ansatz-type']])
         else:
             print(name, 'not supported')
 
     def init_ansatz_qiskit(self, circuit):
         self.ansatz = circuit(self.program.size)
+
+    def ansatz_num_params(self):
+        return self.ansatz.num_parameters
     
     def make_ansatz(self):
         if self.structure['backend'] == self.structure['ansatz'] == 'qiskit':
-            if self.structure['ansatz-type'] == 'EfficientSU2':
-                circuit = EfficientSU2
+            # if self.structure['ansatz-type'] == 'EfficientSU2':
+            #     circuit = EfficientSU2
             return self.ansatz # circuit(self.program.size)
 
     # --- Hamiltonian --- #

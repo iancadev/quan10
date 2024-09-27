@@ -4,6 +4,8 @@ class Visualizer:
     def __init__(self):
         self.E = []
         self.name = "<>"
+        self.energies = []
+        self.order_stats = []
 
     def set_name(self, name):
         self.name = name
@@ -18,6 +20,7 @@ class Visualizer:
         self.print_order_stats()
 
     def convergence_plot(self, _plt=None):
+        if len(self.energies) == 0: return
         counts = np.arange(0, len(self.energies))
         values = self.energies
         
@@ -43,7 +46,10 @@ class Visualizer:
 
         final = moving_average[-1]
         val = moving_average[0]
-        order_of_accuracy = -np.log(np.abs( (val - final) / final ))
+        if val != final:
+            order_of_accuracy = -np.log(np.abs( (val - final) / final ))
+        else:
+            order_of_accuracy = 0
         num = 0
 
         i = 1
@@ -65,6 +71,7 @@ class Visualizer:
               for row in array]))
 
     def order_plot(self, _plt=None):
+        if len(self.order_stats) == 0: return
         counts = self.order_stats[:,0]
         values = self.order_stats[:,1]
         if _plt != None:
@@ -101,6 +108,7 @@ class MetaVisualizer:
         for seq in self.seqs:
             seq.vis.calc_energies()
             seq.vis.calc_order_stats()
+            # print(seq.vis.order_stats)
             # print(seq.vis.order_stats[:,0])
             # print(seq.vis.order_stats[:,1])
             seq.vis.order_plot(plt)
