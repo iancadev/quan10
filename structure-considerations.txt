@@ -1,0 +1,59 @@
+Finance and Data module
+    The statistics defined here are pretty independent of how the problem is solved.
+    Base statistics (like returns). Nothing quantum-related (like Hamiltonian coefficients)
+    Basic wrapper for price dataframes, to create computation short-hand
+
+Portfolio analysis tools
+    Probably just procedural
+    Also pretty static, used in Encoding-py's -> Interpretation
+
+Encoding ".py"'s
+    Procedural
+    These are imported by the actual optimization program. EACH FILE REPRESENTS A SPECIFIC QUADRATIC PROGRAM TO SOLVE BY VQE
+    There is a function that takes in the data (pre-loaded in a file, or live stuff, or a data wrapper) and returns a dict with the useful stuff:
+    Base Statistics
+        - Description (to double check the right file was imported, this desc can be printed out before the VQE runs)
+        - How many qubits are needed
+
+    Hamiltonian Stuff
+        - SparsePauliOps
+        - Quadratic program for hamiltonian
+        - (Qiskit Circuit)
+        - it can take in a bonus "variation" variable (if we ever want to do "collective optimization")
+
+    Interpretation
+        - Takes in ansatz measuring results, outputs helpful portfolio items
+
+EnergySpecialist Class
+    Visualizations for energy, iterations, relative error
+
+Sequencer Class
+    It takes in a backend
+    It sets up ansatz
+        - can be pennylane, qiskit circuit, or qiskit primitive
+        - the end-result is a function "ansatz" that is evaluated in the cost_func with the only argument required being parameters
+        - auto-casts for the backend
+    It takes in Hamiltonian stuff
+    It has two run functions:
+        - cost_func (evaluates hamiltonian)
+            - there can be multiple cost_func's built for multiple pennylane optimizers (kinda like overloading)
+        - ansatz_measure (samples the ansatz)
+    It also keeps track of the energy of each iteration and has a bunch of helpful visualization statistics (EnergySpecialist instance in attribute)
+
+Optimization program
+    Imports the right Encoding .py
+    It initializes a Sequencer: specifies backend and ansatz. feeds Hamiltonian stuff into Sequencer
+    Feeds the cost_func of choice through the optimizer of choice
+    Have the Encoding .py interpret ansatz_measure
+    Ask the sequencer class for its fancy EnergySpecialist outputs.
+
+
+
+The weird compromises:
+- Hamiltonian and ansatz are kept pretty separate
+    - But, this is how it is usually done in practice. The hamiltonian represents the real-world application, the ansatz is just chosen for the quantum computer.
+- the sequencer class will probably have a lot of transpiling if/else's
+    - If all we do is IBM, then the sequencer class will be really simple. If we want to do AWS or pennylane, all the complications are kept in one place.
+- the cost_func is pretty far from the optimizer
+    - All the cost_func does conceptually is evaluate the hamiltonian, and maybe some gradient information (if it's a fancy cost_func)
+        If we're doing batch testing, this means we can just iterate through optimizers, rather than iterating through both cost_functions and optimizers.
