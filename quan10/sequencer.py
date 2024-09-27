@@ -48,6 +48,10 @@ class Sequencer:
                 return False
         return True
 
+    def set_name(self, name):
+        self.name = name
+        self.vis.set_name(name)
+
     # --- Backend : setting, init'ing, casting --- #
     
     def set_backend(self, name):
@@ -140,4 +144,8 @@ class Sequencer:
         pub = (ans, params)
         job = self.statevector_sampler.run([pub], shots=shots)
         return job.result()[0]
-            
+
+    # --- extra stuff --- #
+
+    def visualize(self):
+        self.vis.visualize()
