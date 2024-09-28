@@ -1,1 +1,0 @@
-# functions to generate close.csv from tickers list go here
